@@ -1,0 +1,157 @@
+:root {
+  --dark: #06564f;
+  --green: #087f70;
+  --mint: #effffd;
+  --border: #e3e8e7;
+  --text: #263b38;
+  --muted: #7b8986;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  min-height: 100vh;
+  font-family: "Inter", sans-serif;
+  color: var(--text);
+  background: #f4faf8;
+}
+
+button,
+input {
+  font: inherit;
+}
+
+.login-container {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+}
+
+.login-card {
+  width: 100%;
+  max-width: 420px;
+  background: white;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 38px;
+  box-shadow: 0 12px 40px rgba(6, 86, 79, 0.06);
+}
+
+.logo {
+  display: block;
+  text-align: center;
+  font:
+    27px "Secular One",
+    sans-serif;
+  color: #000;
+  margin-bottom: 38px;
+}
+
+.logo span {
+  color: #2e780e;
+}
+
+.login-heading {
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.admin-label {
+  display: inline-block;
+  color: var(--green);
+  background: var(--mint);
+  padding: 7px 12px;
+  border-radius: 20px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  margin-bottom: 15px;
+}
+
+.login-heading h1 {
+  color: var(--dark);
+  font-size: 25px;
+  margin-bottom: 9px;
+}
+
+.login-heading p {
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+.form-group {
+  margin-bottom: 19px;
+}
+
+.form-group label {
+  display: block;
+  font-size: 12px;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+.form-group input {
+  width: 100%;
+  padding: 13px 14px;
+  border: 1px solid var(--border);
+  border-radius: 7px;
+  outline: none;
+  color: var(--text);
+  font-size: 12px;
+  transition: 0.2s;
+}
+
+.form-group input:focus {
+  border-color: var(--green);
+  box-shadow: 0 0 0 3px rgba(8, 127, 112, 0.08);
+}
+
+.login-button {
+  width: 100%;
+  border: none;
+  border-radius: 7px;
+  padding: 14px;
+  margin-top: 8px;
+  background: var(--dark);
+  color: white;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.login-button:hover {
+  background: var(--green);
+}
+
+.login-error {
+  min-height: 16px;
+  color: #c14d47;
+  font-size: 11px;
+  margin-top: 3px;
+}
+
+.login-footer {
+  text-align: center;
+  color: var(--muted);
+  font-size: 10px;
+  margin-top: 28px;
+}
+
+/* RESPONSIVE */
+
+@media (max-width: 480px) {
+  .login-card {
+    padding: 28px 22px;
+  }
+
+  .login-heading h1 {
+    font-size: 22px;
+  }
+}

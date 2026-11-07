@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>LandayanFinds</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@200;400;500;600&family=Secular+One&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <!-- ONE shared header  -->
+    <header id="header">
+        <div class="header-inner">
+            <a class="logo" data-page="home">Landayan<span>Finds</span></a>
+            <nav>
+                <a data-page="home" data-nav>Home</a>
+                <a data-page="businesses" data-nav>Businesses</a>
+                <a data-page="jobs" data-nav>Jobs</a>
+            </nav>
+            <a class="btn" href="login.html">Login</a>
+        </div>
+    </header>
+
+    <main>
+        <!-- Each page is a section. JavaScript shows only one. -->
+        <section id="home" class="page pad">
+            <!-- Cover -->
+            <div class="cover">
+                <h1>Discover Local Businesses in BRGY Landayan</h1>
+                <p>Support local, Shop local, Find what you need, right here in Landayan, City of San Pedro, Laguna</p>
+                <div class="search">
+                    <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="#087f70" stroke-width="2.500"
+                        stroke-linecap="round">
+                        <circle cx="10.500" cy="10.500" r="7" />
+                        <path d="M16 16l5 5" />
+                    </svg>
+                    <input type="text" placeholder="Search for business {eg. bakery, store, etc}">
+                    <button class="btn">Search</button>
+                </div>
+            </div>
+
+            <!-- Featured businesses -->
+            <div class="section-head">
+                <h2>Featured Businesses</h2>
+                <a class="view-all" data-page="businesses">View All</a>
+            </div>
+            <div class="cards" id="featured-list"></div>
+        </section>
+
+        <section id="businesses" class="page">
+            <div class="band">
+                <div class="pad">
+                    <h1>Find Businesses</h1>
+                    <p>Search and filter local businesses in Barangay Landayan.</p>
+                    <div class="search search-line">
+                        <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="#087f70" stroke-width="2.5"
+                            stroke-linecap="round">
+                            <circle cx="10.5" cy="10.5" r="7" />
+                            <path d="M16 16l5 5" />
+                        </svg>
+                        <input type="text" placeholder="Search for business {eg. bakery, store, etc}">
+                        <button class="btn">Search</button>
+                    </div>
+                </div>
+            </div>
+            <div class="pad browse">
+                <aside>
+                    <h2>Categories</h2>
+                    <div class="cat-box"><button class="cat active">All</button><button class="cat">Food and
+                            Beverages</button><button class="cat">Grocery</button><button class="cat">Retail
+                            Store</button><button class="cat">Services</button><button class="cat">Health &amp;
+                            Wellness</button><button class="cat">Others</button></div>
+                </aside>
+                <div class="results-col">
+                    <p class="count">Showing 0 results</p>
+                    <div class="results" id="business-results"></div>
+                </div>
+            </div>
+        </section>
+
+        <section id="shop-details" class="page" data-parent="businesses">
+            <a class="back" data-page="businesses">&larr; Back to listings</a>
+            <h1>Shop Details</h1>
+        </section>
+
+        <section id="jobs" class="page">
+            <div class="band">
+                <div class="pad">
+                    <h1>Now Hiring</h1>
+                    <p>Local shops or stores that open for hiring</p>
+                    <div class="search search-line">
+                        <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="#087f70" stroke-width="2.5"
+                            stroke-linecap="round">
+                            <circle cx="10.5" cy="10.5" r="7" />
+                            <path d="M16 16l5 5" />
+                        </svg>
+                        <input type="text" placeholder="Search for business {eg. bakery, store, etc}">
+                        <button class="btn">Search</button>
+                    </div>
+                </div>
+            </div>
+            <div class="pad browse">
+                <aside>
+                    <h2>Categories</h2>
+                    <div class="cat-box"><button class="cat active">All</button><button class="cat">Food and
+                            Beverages</button><button class="cat">Grocery</button><button class="cat">Convenience
+                            Store</button><button class="cat">Services</button><button class="cat">Health &amp;
+                            Wellness</button><button class="cat">Others</button></div>
+                </aside>
+                <div class="results-col">
+                    <p class="count">Showing 0 results</p>
+                    <div class="results" id="job-results"></div>
+                </div>
+            </div>
+        </section>
+
+        <section id="job-info" class="page" data-parent="jobs">
+            <a class="back" data-page="jobs">&larr; Back to listings</a>
+            <h1>Job Info</h1>
+        </section>
+
+        <!-- ACCOUNT PAGE -->
+        <section id="account" class="page pad">
+            <div class="account-layout">
+
+                <!-- Left: profile card -->
+                <aside class="profile-card">
+                    <div class="avatar" id="accAvatar"></div>
+                    <h2 id="accFullName">&nbsp;</h2>
+                    <button class="btn">Change Photo</button>
+                </aside>
+
+                <!-- Right: tabs + boxes -->
+                <div class="account-main">
+                    <div class="tabs">
+                        <button class="tab active" data-tab="account-info">Information</button>
+                        <button class="tab" data-tab="account-apps">Applications</button>
+                        <a class="logout-link" id="logoutLink">Log out</a>
+                    </div>
+
+                    <div id="account-info" class="tab-panel active">
+
+                        <div class="info-box">
+                            <h2>Personal Information</h2>
+                            <p>Name: <span id="accName"></span></p>
+                            <p>Age: <span id="accAge"></span></p>
+                            <p>Gender: <span id="accGender"></span></p>
+                        </div>
+
+                        <div class="info-box">
+                            <h2>Contacts</h2>
+                            <p>Email: <span id="accEmail"></span></p>
+                            <p>Phone Number: <span id="accPhone"></span></p>
+                        </div>
+
+                        <!-- Resume: the button changes (Add CV / Update CV / Download CV) -->
+                        <div class="info-box resume-box">
+                            <h2>Resume</h2>
+                            <p class="muted" id="cvStatus"></p>
+                            <button class="btn" id="cvButton">Add CV</button>
+                            <input type="file" id="cvFile" accept=".pdf,.doc,.docx" hidden>
+                        </div>
+
+                    </div>
+
+                    <div id="account-apps" class="tab-panel">
+                        <div class="info-box">
+                            <h2>Applications</h2>
+                            <p class="muted">You have no applications yet.</p>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+    </main>
+
+    <!-- ONE shared footer  -->
+    <footer id="footer">
+        <div class="footer-inner">
+            <span class="logo-white">LandayanFinds</span>
+            <div class="footer-mid">
+                <nav>
+                    <a data-page="home">Home</a>
+                    <a data-page="businesses">Businesses</a>
+                    <a data-page="jobs">Jobs</a>
+                </nav>
+                <small>@ 2026 LandayanFinds. All rights reserved.</small>
+            </div>
+            <span></span>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+
+</html>
