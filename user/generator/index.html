@@ -1,0 +1,394 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Business Generator | LandayanFinds</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+</head>
+<body>
+
+    <main class="generator">
+
+        <header class="topbar">
+            <div>
+                <h1>LandayanFinds</h1>
+                <p>Business and Job Management</p>
+            </div>
+            <span class="admin-label"><i class="fa-solid fa-user-shield"></i> Admin Panel</span>
+        </header>
+
+        <section class="content">
+
+            <div class="page-heading">
+                <div>
+                    <h2>Businesses</h2>
+                    <p>Manage your local businesses, products, services, and job openings.</p>
+                </div>
+
+                <button type="button" id="add-business-button" class="primary-button">
+                    <i class="fa-solid fa-plus"></i>
+                    Add Business
+                </button>
+            </div>
+
+            <div class="business-toolbar">
+                <div class="search-box">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                    <input type="search" id="business-search" placeholder="Search businesses...">
+                </div>
+
+                <span id="business-count">0 businesses</span>
+            </div>
+
+            <div id="business-list" class="business-list">
+                <div class="empty-state">
+                    <i class="fa-solid fa-store"></i>
+                    <h3>No businesses yet</h3>
+                    <p>Add your first business to get started.</p>
+                </div>
+            </div>
+
+        </section>
+    </main>
+
+    <div class="modal" id="business-modal" hidden>
+        <div class="modal-overlay" id="modal-overlay"></div>
+
+        <section class="modal-window">
+
+            <header class="modal-header">
+                <div>
+                    <h2 id="modal-title">Add Business</h2>
+                    <p>Enter the business information below.</p>
+                </div>
+
+                <button type="button" id="close-modal-button" class="icon-button" aria-label="Close">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </header>
+
+            <form id="business-form">
+
+                <input type="hidden" id="business-id">
+
+                <section class="form-section">
+                    <div class="section-heading">
+                        <span>01</span>
+                        <div>
+                            <h3>Business Information</h3>
+                            <p>Basic information about the shop.</p>
+                        </div>
+                    </div>
+
+                    <div class="form-grid">
+                        <label class="form-field full-width">
+                            <span>Shop Name *</span>
+                            <input type="text" id="business-name" placeholder="Enter business name" required>
+                        </label>
+
+                        <label class="form-field">
+                            <span>Category *</span>
+                            <select id="business-category" required>
+                                <option value="">Choose category</option>
+                                <option value="Food and Beverages">Food and Beverages</option>
+                                <option value="Services">Services</option>
+                                <option value="Stores">Stores</option>
+                                <option value="Health and Care">Health and Care</option>
+                                <option value="Others">Others</option>
+                            </select>
+                        </label>
+
+                        <label class="form-field full-width">
+                            <span>About the Shop *</span>
+                            <textarea id="business-about" rows="4" placeholder="Describe the business..." required></textarea>
+                        </label>
+                    </div>
+                </section>
+
+                <section class="form-section">
+                    <div class="section-heading">
+                        <span>02</span>
+                        <div>
+                            <h3>Contact Information</h3>
+                            <p>How customers can contact the business.</p>
+                        </div>
+                    </div>
+
+                    <div class="form-grid">
+                        <label class="form-field">
+                            <span>Email</span>
+                            <input type="email" id="business-email" placeholder="example@email.com">
+                        </label>
+
+                        <label class="form-field">
+                            <span>Facebook</span>
+                            <input type="text" id="business-facebook" placeholder="Facebook page URL">
+                        </label>
+
+                        <label class="form-field">
+                            <span>Contact Number</span>
+                            <input type="text" id="business-number" placeholder="09XXXXXXXXX">
+                        </label>
+
+                        <label class="form-field">
+                            <span>Website</span>
+                            <input type="text" id="business-website" placeholder="https://example.com">
+                        </label>
+                    </div>
+                </section>
+
+                <section class="form-section">
+                    <div class="section-heading">
+                        <span>03</span>
+                        <div>
+                            <h3>Operating Hours and Location</h3>
+                            <p>Business schedule and physical location.</p>
+                        </div>
+                    </div>
+
+                    <div class="form-grid">
+                        <label class="form-field full-width">
+                            <span>Operating Hours</span>
+                            <input type="text" id="business-hours" placeholder="Example: Monday - Sunday">
+                        </label>
+
+                        <label class="form-field">
+                            <span>Opening Time</span>
+                            <input type="time" id="business-open-time">
+                        </label>
+
+                        <label class="form-field">
+                            <span>Closing Time</span>
+                            <input type="time" id="business-close-time">
+                        </label>
+
+                        <label class="form-field full-width">
+                            <span>Address *</span>
+                            <textarea id="business-address" rows="2" placeholder="Enter complete business address" required></textarea>
+                        </label>
+
+                        <label class="form-field full-width">
+                            <span>Map Embed</span>
+                            <textarea id="business-map" rows="3" placeholder="Paste Google Maps embed URL or iframe code"></textarea>
+                        </label>
+                    </div>
+                </section>
+
+                <section class="form-section">
+                    <div class="section-heading">
+                        <span>04</span>
+                        <div>
+                            <h3>Business Photos</h3>
+                            <p>Enter the image paths from your uploads folder.</p>
+                        </div>
+                    </div>
+
+                    <div class="form-grid">
+                        <label class="form-field full-width">
+                            <span>Profile Photo</span>
+                            <input type="text" id="business-profile" placeholder="uploads/heroes/profile.jpg">
+                        </label>
+
+                        <label class="form-field full-width">
+                            <span>Cover Photo</span>
+                            <input type="text" id="business-cover" placeholder="uploads/heroes/cover.jpg">
+                        </label>
+
+                        <label class="form-field">
+                            <span>Photo 2</span>
+                            <input type="text" id="business-photo-2" placeholder="uploads/heroes/photo1.jpg">
+                        </label>
+
+                        <label class="form-field">
+                            <span>Photo 3</span>
+                            <input type="text" id="business-photo-3" placeholder="uploads/heroes/photo2.jpg">
+                        </label>
+
+                        <label class="form-field">
+                            <span>Photo 4</span>
+                            <input type="text" id="business-photo-4" placeholder="uploads/heroes/photo3.jpg">
+                        </label>
+
+                        <label class="form-field">
+                            <span>Photo 5</span>
+                            <input type="text" id="business-photo-5" placeholder="uploads/heroes/photo4.jpg">
+                        </label>
+                    </div>
+                </section>
+
+                <section class="form-section">
+                    <div class="section-heading">
+                        <span>05</span>
+                        <div>
+                            <h3>Products and Services</h3>
+                            <p>Add the products or services offered by the business.</p>
+                        </div>
+                    </div>
+
+                    <div id="items-container" class="repeat-container"></div>
+
+                    <button type="button" id="add-item-button" class="secondary-button">
+                        <i class="fa-solid fa-plus"></i>
+                        Add Another Item
+                    </button>
+
+                    <template id="item-template">
+                        <div class="repeat-card item-card">
+                            <div class="repeat-card-header">
+                                <h4>Item</h4>
+                                <button type="button" class="remove-item-button icon-button" aria-label="Remove item">
+                                    <i class="fa-solid fa-trash"></i>
+                                </button>
+                            </div>
+
+                            <div class="form-grid">
+                                <label class="form-field">
+                                    <span>Item Name</span>
+                                    <input type="text" class="item-name" placeholder="Example: Haircut">
+                                </label>
+
+                                <label class="form-field">
+                                    <span>Type</span>
+                                    <select class="item-type">
+                                        <option value="product">Product</option>
+                                        <option value="service">Service</option>
+                                    </select>
+                                </label>
+
+                                <label class="form-field">
+                                    <span>Price</span>
+                                    <input type="text" class="item-price" placeholder="Example: ₱150">
+                                </label>
+
+                                <label class="form-field">
+                                    <span>Photo Path</span>
+                                    <input type="text" class="item-photo" placeholder="uploads/heroes/items/item1.jpg">
+                                </label>
+
+                                <label class="form-field full-width">
+                                    <span>Description</span>
+                                    <textarea class="item-description" rows="2" placeholder="Describe this product or service..."></textarea>
+                                </label>
+                            </div>
+                        </div>
+                    </template>
+                </section>
+
+                <section class="form-section">
+                    <div class="section-heading">
+                        <span>06</span>
+                        <div>
+                            <h3>Hiring Information</h3>
+                            <p>Enable this if the business has an available job position.</p>
+                        </div>
+                    </div>
+
+                    <label class="hiring-toggle">
+                        <input type="checkbox" id="business-hiring">
+                        <span class="toggle-design"></span>
+                        <span>
+                            <strong>Currently Hiring</strong>
+                            <small>Show a job listing for this business.</small>
+                        </span>
+                    </label>
+
+                    <div id="job-section" hidden>
+
+                        <div class="form-grid job-fields">
+                            <label class="form-field full-width">
+                                <span>Job Position *</span>
+                                <input type="text" id="job-title" placeholder="Example: Store Assistant">
+                            </label>
+
+                            <label class="form-field full-width">
+                                <span>Job Description *</span>
+                                <textarea id="job-description" rows="4" placeholder="Describe the job position..."></textarea>
+                            </label>
+
+                            <label class="form-field full-width">
+                                <span>Requirements</span>
+                                <textarea id="job-requirements" rows="4" placeholder="Enter each requirement on a new line.&#10;Example:&#10;Bio data&#10;Resume"></textarea>
+                            </label>
+
+                            <label class="form-field full-width">
+                                <span>Responsibilities</span>
+                                <textarea id="job-responsibilities" rows="4" placeholder="Enter each responsibility on a new line."></textarea>
+                            </label>
+
+                            <label class="form-field full-width">
+                                <span>Qualifications</span>
+                                <textarea id="job-qualifications" rows="4" placeholder="Enter each qualification on a new line."></textarea>
+                            </label>
+
+                            <label class="form-field">
+                                <span>Job Time / Employment Type</span>
+                                <input type="text" id="job-time" placeholder="Example: Full-time / Part-time">
+                            </label>
+
+                            <label class="form-field">
+                                <span>Location</span>
+                                <input type="text" id="job-location" placeholder="Job location">
+                            </label>
+
+                            <label class="form-field">
+                                <span>Salary</span>
+                                <input type="text" id="job-salary" placeholder="Example: ₱650/day">
+                            </label>
+
+                            <label class="form-field">
+                                <span>Schedule</span>
+                                <input type="text" id="job-schedule" placeholder="Example: Day shift">
+                            </label>
+                        </div>
+
+                        <div class="application-section">
+                            <h4>Application Process / How to Apply</h4>
+                            <p>Enter the instructions applicants should follow.</p>
+
+                            <label class="form-field">
+                                <span>Call</span>
+                                <input type="text" id="apply-call" placeholder="Example: 09123456789">
+                            </label>
+
+                            <label class="form-field">
+                                <span>Send Your Resume To</span>
+                                <input type="text" id="apply-email" placeholder="Example: example@email.com">
+                            </label>
+
+                            <label class="form-field">
+                                <span>Visit the Shop</span>
+                                <input type="text" id="apply-visit" placeholder="Example: Go to the shop">
+                            </label>
+
+                            <label class="form-field">
+                                <span>Other Instructions</span>
+                                <textarea id="apply-other" rows="2" placeholder="Additional application instructions..."></textarea>
+                            </label>
+                        </div>
+
+                    </div>
+                </section>
+
+                <div id="form-message" class="form-message" role="status"></div>
+
+                <footer class="modal-footer">
+                    <button type="button" id="cancel-form-button" class="secondary-button">Cancel</button>
+                    <button type="submit" id="save-business-button" class="primary-button">
+                        <i class="fa-solid fa-floppy-disk"></i>
+                        Save Business
+                    </button>
+                </footer>
+
+            </form>
+        </section>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
