@@ -2891,3 +2891,30 @@ nav a:hover {
     right: 12px;
   }
 }
+/* CENTER BUSINESSES AND JOBS HERO */
+
+.jobs-hero {
+  justify-content: center;
+  text-align: center;
+}
+
+.jobs-hero-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.jobs-hero h1 {
+  max-width: 100%;
+  text-align: center;
+}
+
+.jobs-hero p {
+  text-align: center;
+}
+
+.jobs-search {
+  margin-left: auto;
+  margin-right: auto;
+}
