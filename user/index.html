@@ -23,7 +23,6 @@
             <nav id="main-nav">
                 <a data-page="home" data-nav>Home</a>
                 <a data-page="businesses" data-nav>Businesses</a>
-                <a data-page="jobs" data-nav>Jobs</a>
             </nav>
         </div>
     </header>
@@ -38,19 +37,26 @@
                         <circle cx="10.5" cy="10.5" r="7" />
                         <path d="M16 16l5 5" />
                     </svg>
-                    <input type="text" placeholder="Search for business {eg. bakery, store, etc}">
-                    <button class="btn">Search</button>
+                    <input type="search" id="home-search-input" placeholder="Search by business name">
+                    <button type="button" class="btn" id="home-search-button">Search</button>
                 </div>
             </div>
 
-            <div class="section-head">
+                       <div class="section-head">
                 <h2>Featured Businesses</h2>
                 <a class="view-all" data-page="businesses">View All</a>
             </div>
             <div class="cards" id="featured-list"></div>
+
+            <div class="section-head">
+                <h2>Open Now</h2>
+                <a class="view-all" id="open-now-view-all" data-page="businesses">View All</a>
+            </div>
+            <div class="cards" id="open-now-list"></div>
         </section>
 
         <section id="businesses" class="page">
+
             <div class="jobs-hero">
                 <div class="jobs-hero-content">
                     <span class="jobs-eyebrow">LOCAL BUSINESS DIRECTORY</span>
@@ -62,7 +68,7 @@
                             <circle cx="10.5" cy="10.5" r="7" />
                             <path d="M16 16l5 5" />
                         </svg>
-                        <input type="search" id="business-search-input" placeholder="Search business name, product, or keyword">
+                        <input type="search" id="business-search-input" placeholder="Search by business name">
                         <button class="btn" id="business-search-button" type="button">Search Businesses</button>
                     </div>
                 </div>
@@ -92,22 +98,23 @@
 
                         <div class="filter-panel" id="business-filter-panel">
                             <div class="filter-panel-inner">
-                        <div class="jobs-filter-heading">
-                            <h3>Filters</h3>
-                            <button type="button" id="clear-business-filters">Clear all</button>
-                        </div>
+                                <div class="jobs-filter-heading">
+                                    <h3>Filters</h3>
+                                    <button type="button" id="clear-business-filters">Clear all</button>
+                                </div>
 
-                        <div class="jobs-filter-group">
-                            <h4>Business Category</h4>
-                            <div class="jobs-category-list">
-                                <button class="job-category active" type="button" data-business-category="All">All categories</button>
-                                <button class="job-category" type="button" data-business-category="Food and Beverages">Food and Beverages</button>
-                                <button class="job-category" type="button" data-business-category="Services">Services</button>
-                                <button class="job-category" type="button" data-business-category="Stores">Stores</button>
-                                <button class="job-category" type="button" data-business-category="Health and Care">Health and Care</button>
-                                <button class="job-category" type="button" data-business-category="Others">Others</button>
-                            </div>
-                        </div>
+                                <div class="jobs-filter-group">
+                                    <h4>Business Category</h4>
+                                    <div class="jobs-category-list">
+                                        <button class="job-category active" type="button" data-business-category="All">All categories</button>
+                                        <button class="job-category" type="button" data-business-category="Food and Beverages">Food and Beverages</button>
+                                        <button class="job-category" type="button" data-business-category="Services">Services</button>
+                                        <button class="job-category" type="button" data-business-category="Stores">Stores</button>
+                                        <button class="job-category" type="button" data-business-category="Health and Care">Health and Care</button>
+                                        <button class="job-category" type="button" data-business-category="Others">Others</button>
+                                    </div>
+                                </div>
+
                                 <div class="filter-actions">
                                     <button type="button" class="filter-clear">Clear all</button>
                                 </div>
@@ -121,9 +128,10 @@
                             <label class="jobs-sort">
                                 <span>Sort by</span>
                                 <select id="business-sort">
-                                    <option value="name">Business name</option>
-                                    <option value="category">Category</option>
-                                </select>
+    <option value="name">Business name</option>
+    <option value="category">Category</option>
+    <option value="open">Open now </option>
+</select>
                             </label>
                         </div>
 
@@ -136,7 +144,10 @@
         </section>
 
         <section id="shop-details" class="page shop-page" data-parent="businesses">
-            <a class="back" data-page="businesses">&larr; Back to business listings</a>
+            <button type="button" class="back" data-page="businesses">
+    <i class="ti ti-chevron-left" aria-hidden="true"></i>
+    <span>Back to businesses</span>
+</button>
 
             <div class="shop-cover" id="shop-cover"></div>
 
@@ -214,150 +225,6 @@
                 </aside>
             </div>
         </section>
-
-        <section id="jobs" class="page">
-            <div class="jobs-hero">
-                <div class="jobs-hero-content">
-                    <span class="jobs-eyebrow">CAREER OPPORTUNITIES IN LANDAYAN</span>
-                    <h1>Find Your Next Opportunity.</h1>
-                    <p>Explore job openings from local businesses in Barangay Landayan.</p>
-
-                    <div class="jobs-search">
-                        <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
-                            <circle cx="10.5" cy="10.5" r="7" />
-                            <path d="M16 16l5 5" />
-                        </svg>
-                        <input type="search" id="job-search-input" placeholder="Search job title, business, or keyword">
-                        <button class="btn" id="job-search-button" type="button">Search Jobs</button>
-                    </div>
-                </div>
-            </div>
-
-            <div class="jobs-content">
-                <div class="jobs-heading">
-                    <div>
-                        <span class="jobs-eyebrow jobs-heading-eyebrow">LOCAL JOB LISTINGS</span>
-                        <h2>Available Jobs</h2>
-                        <p>Find a role that matches your skills and interests.</p>
-                    </div>
-                    <span class="jobs-total" id="job-results-count">0 jobs available</span>
-                </div>
-
-                <div class="jobs-layout">
-                    <aside class="jobs-sidebar">
-                        <button type="button" class="filter-toggle" aria-expanded="false" aria-controls="job-filter-panel">
-                            <span class="filter-toggle-label">
-                                <svg class="filter-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 7h10M18 7h2M4 17h2M10 17h10"/><circle cx="16" cy="7" r="2"/><circle cx="8" cy="17" r="2"/></svg>
-                                <span>Filters</span>
-                                <span class="filter-badge" hidden>0</span>
-                            </span>
-                            <span class="filter-toggle-summary">All categories</span>
-                            <svg class="filter-chevron" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
-                        </button>
-
-                        <div class="filter-panel" id="job-filter-panel">
-                            <div class="filter-panel-inner">
-                        <div class="jobs-filter-heading">
-                            <h3>Filters</h3>
-                            <button type="button" id="clear-job-filters">Clear all</button>
-                        </div>
-
-                        <div class="jobs-filter-group">
-                            <h4>Business Category</h4>
-                            <div class="jobs-category-list">
-                                <button class="job-category active" type="button" data-job-category="All">All categories</button>
-                                <button class="job-category" type="button" data-job-category="Food and Beverages">Food and Beverages</button>
-                                <button class="job-category" type="button" data-job-category="Services">Services</button>
-                                <button class="job-category" type="button" data-job-category="Stores">Stores</button>
-                                <button class="job-category" type="button" data-job-category="Health and Care">Health and Care</button>
-                                <button class="job-category" type="button" data-job-category="Others">Others</button>
-                            </div>
-                        </div>
-
-                        <div class="jobs-filter-group">
-                            <h4>Employment Type</h4>
-                            <label class="job-check">
-                                <input type="checkbox" value="Full-time" data-job-type>
-                                <span>Full-time</span>
-                            </label>
-                            <label class="job-check">
-                                <input type="checkbox" value="Part-time" data-job-type>
-                                <span>Part-time</span>
-                            </label>
-                        </div>
-                                <div class="filter-actions">
-                                    <button type="button" class="filter-clear">Clear all</button>
-                                </div>
-                            </div>
-                        </div>
-                    </aside>
-
-                    <div class="jobs-results">
-                        <div class="jobs-results-top">
-                            <p id="job-results-label">Showing all available positions</p>
-                            <label class="jobs-sort">
-                                <span>Sort by</span>
-                                <select id="job-sort">
-                                    <option value="title">Job title</option>
-                                    <option value="business">Business name</option>
-                                </select>
-                            </label>
-                        </div>
-
-                        <div class="job-list" id="job-results"></div>
-                        <p class="jobs-empty" id="jobs-empty" hidden>No jobs are currently available.</p>
-                        <div class="jobs-pagination" id="jobs-pagination"></div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <section id="job-info" class="page job-info-page" data-parent="jobs">
-            <a class="back" data-page="jobs">&larr; Back to job listings</a>
-
-            <div class="job-detail-card">
-                <div class="job-detail-top">
-                    <div>
-                        <span class="jobs-eyebrow" id="job-detail-category">JOB OPPORTUNITY</span>
-                        <h1 id="job-detail-title">Job Details</h1>
-                        <p id="job-detail-business" class="job-detail-business"></p>
-                    </div>
-                    <span class="job-status" id="job-detail-status">Hiring</span>
-                </div>
-
-                <div class="job-detail-meta" id="job-detail-meta"></div>
-
-                <div class="job-detail-section">
-                    <h2>Job Description</h2>
-                    <p id="job-detail-description"></p>
-                </div>
-
-                <div class="job-detail-section" id="job-detail-responsibilities-section">
-                    <h2>Responsibilities</h2>
-                    <ul id="job-detail-responsibilities"></ul>
-                </div>
-
-                <div class="job-detail-section" id="job-detail-requirements-section">
-                    <h2>Requirements</h2>
-                    <ul id="job-detail-requirements"></ul>
-                </div>
-
-                <div class="job-detail-section" id="job-detail-qualifications-section">
-                    <h2>Qualifications</h2>
-                    <ul id="job-detail-qualifications"></ul>
-                </div>
-
-                <div class="job-detail-section" id="job-detail-application-section">
-                    <h2>How to Apply</h2>
-                    <ol id="job-detail-application"></ol>
-                </div>
-
-                <div class="job-detail-section" id="job-detail-map-section" hidden>
-                    <h2>Job Location</h2>
-                    <div class="shop-map" id="job-detail-map"></div>
-                </div>
-            </div>
-        </section>
     </main>
 
     <footer id="footer">
@@ -367,7 +234,6 @@
                 <nav>
                     <a data-page="home">Home</a>
                     <a data-page="businesses">Businesses</a>
-                    <a data-page="jobs">Jobs</a>
                 </nav>
                 <small>@ 2026 LandayanFinds. All rights reserved.</small>
             </div>

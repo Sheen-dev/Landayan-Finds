@@ -14,7 +14,31 @@ function respond($status, $payload) {
 function clean_image($path) {
     $path = trim((string) $path);
 
-    if ($path === "" || strpos($path, "..") !== false) {
+    if ($path === "") {
+        return null;
+    }
+
+    if (preg_match('#^https?://[^\s"\'<>]+$#i', $path)) {
+        $url = filter_var($path, FILTER_VALIDATE_URL);
+
+        if (!$url) {
+            return null;
+        }
+
+        $parts = parse_url($url);
+
+        if (
+            empty($parts["scheme"]) ||
+            empty($parts["host"]) ||
+            !in_array(strtolower($parts["scheme"]), ["http", "https"], true)
+        ) {
+            return null;
+        }
+
+        return $path;
+    }
+
+    if (strpos($path, "..") !== false) {
         return null;
     }
 
@@ -22,13 +46,7 @@ function clean_image($path) {
 }
 
 function clean_photo($path) {
-    $path = clean_image($path);
-
-    if (!$path || stripos(basename($path), "photo") === false) {
-        return null;
-    }
-
-    return $path;
+    return clean_image($path);
 }
 
 function clean_map($code) {
@@ -38,7 +56,7 @@ function clean_map($code) {
         return null;
     }
 
-    if (preg_match('/src\s*=\s*["\']([^"\']+)["\']/i', $code, $match)) {
+    if (preg_match('~src\s*=\s*["\']([^"\']+)["\']~i', $code, $match)) {
         $code = $match[1];
     }
 
@@ -62,7 +80,7 @@ try {
     $businessRows = $pdo->query(
         "SELECT business_id, business_name, category, shop_info, address,
                 contact_number, contact_email, contact_facebook,
-                operating_hours, open_time, close_time,
+                operating_hours, open_time, close_time, is_24_7,
                 profile_image, main_image, sub_image_1, sub_image_2,
                 sub_image_3, sub_image_4, map_embed_code
          FROM businesses
@@ -112,7 +130,8 @@ try {
             "contact" => $row["contact_number"],
             "email" => $row["contact_email"],
             "facebook" => $row["contact_facebook"],
-            "hours" => $row["operating_hours"],
+            "hours" => $row["is_24_7"] ? "Open 24/7" : $row["operating_hours"],
+"is247" => (bool) $row["is_24_7"],
             "openTime" => clean_time($row["open_time"]),
             "closeTime" => clean_time($row["close_time"]),
             "profile" => clean_image($row["profile_image"]),

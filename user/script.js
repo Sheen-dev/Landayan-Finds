@@ -1,4 +1,3 @@
-
 const pages = document.querySelectorAll(".page");
 const navLinks = document.querySelectorAll("[data-nav]");
 
@@ -282,397 +281,6 @@ document.addEventListener("keydown", (event) => {
   }
 });
 
-/* JOB LISTINGS */
-
-let jobListings = [];
-let jobsLoadFailed = false;
-
-const jobResults = document.getElementById("job-results");
-const jobSearchInput = document.getElementById("job-search-input");
-const jobSearchButton = document.getElementById("job-search-button");
-const jobResultsCount = document.getElementById("job-results-count");
-const jobResultsLabel = document.getElementById("job-results-label");
-const jobsEmpty = document.getElementById("jobs-empty");
-const jobsPagination = document.getElementById("jobs-pagination");
-const jobSort = document.getElementById("job-sort");
-const clearJobFilters = document.getElementById("clear-job-filters");
-
-let selectedJobCategory = "All";
-let currentJobPage = 1;
-const jobsPerPage = 4;
-
-async function loadJobs() {
-  jobResultsLabel.textContent = "Loading jobs...";
-
-  try {
-    const response = await fetch("api/jobs.php");
-    const result = await response.json();
-
-    if (!response.ok || !result.success) {
-      throw new Error(result.message || "Unable to load jobs.");
-    }
-
-    jobListings = result.jobs;
-    jobsLoadFailed = false;
-  } catch (error) {
-    console.error(error);
-    jobListings = [];
-    jobsLoadFailed = true;
-  }
-
-  renderJobs();
-}
-
-function getSelectedJobTypes() {
-  return Array.from(document.querySelectorAll("[data-job-type]:checked")).map(
-    (checkbox) => checkbox.value
-  );
-}
-
-function getFilteredJobs() {
-  const searchTerm = jobSearchInput.value.trim().toLowerCase();
-  const selectedTypes = getSelectedJobTypes();
-
-  const filteredJobs = jobListings.filter((job) => {
-    const matchesSearch = [
-      job.title,
-      job.business,
-      job.category,
-      job.description
-    ]
-      .join(" ")
-      .toLowerCase()
-      .includes(searchTerm);
-
-    const matchesCategory =
-      selectedJobCategory === "All" ||
-      job.category === selectedJobCategory;
-
-    const matchesType =
-      selectedTypes.length === 0 ||
-      (job.types || []).some((type) => selectedTypes.includes(type));
-
-    return matchesSearch && matchesCategory && matchesType;
-  });
-
-  const sortValue = jobSort.value;
-
-  if (sortValue === "title") {
-    filteredJobs.sort((a, b) => String(a.title).localeCompare(String(b.title)));
-  } else if (sortValue === "business") {
-    filteredJobs.sort((a, b) =>
-      String(a.business).localeCompare(String(b.business))
-    );
-  }
-
-  return filteredJobs;
-}
-
-function renderJobs() {
-  const filteredJobs = getFilteredJobs();
-  const totalJobs = filteredJobs.length;
-  const totalPages = Math.ceil(totalJobs / jobsPerPage);
-
-  if (currentJobPage > totalPages && totalPages > 0) {
-    currentJobPage = totalPages;
-  }
-
-  if (totalPages === 0) {
-    currentJobPage = 1;
-  }
-
-  const startIndex = (currentJobPage - 1) * jobsPerPage;
-  const displayedJobs = filteredJobs.slice(
-    startIndex,
-    startIndex + jobsPerPage
-  );
-
-  jobResults.innerHTML = "";
-
-  jobResultsCount.textContent =
-    `${totalJobs} ${totalJobs === 1 ? "job" : "jobs"} available`;
-
-  jobResultsLabel.textContent =
-    totalJobs > 0
-      ? `Showing ${startIndex + 1}-${Math.min(
-          startIndex + jobsPerPage,
-          totalJobs
-        )} of ${totalJobs} positions`
-      : "No positions found";
-
-  jobsEmpty.hidden = totalJobs !== 0;
-
-  if (jobsLoadFailed) {
-    jobsEmpty.textContent =
-      "We could not load the jobs. Please try again later.";
-  } else if (jobListings.length === 0) {
-    jobsEmpty.textContent = "No jobs are currently available.";
-  } else {
-    jobsEmpty.textContent = "No jobs match your search.";
-  }
-
-  displayedJobs.forEach((job) => {
-    const card = document.createElement("article");
-    card.className = "job-card";
-
-    const tags = (job.types || [])
-      .map((type) => `<span class="job-tag">${escapeHtml(type)}</span>`)
-      .join("");
-
-    const style = categoryStyle(job.category);
-
-    card.innerHTML = `
-      <div class="job-card-icon">
-        ${imageOrPlaceholder(
-          job.profile,
-          job.category,
-          style.icon,
-          job.business
-        )}
-      </div>
-
-      <div class="job-card-content">
-        <h3>${escapeHtml(job.title)}</h3>
-        <p class="job-card-business">${escapeHtml(job.business)} · ${escapeHtml(job.category)}</p>
-
-        <div class="job-card-meta">
-          <span>Schedule: ${escapeHtml(job.schedule)}</span>
-          <span>Salary: ${escapeHtml(job.salary)}</span>
-          <span>Posted: ${escapeHtml(formatJobDate(job.posted))}</span>
-        </div>
-
-        <div class="job-card-tags">${tags}</div>
-      </div>
-
-      <div class="job-card-action">
-        <button type="button" data-job-id="${escapeHtml(job.id)}">
-          View Details →
-        </button>
-      </div>
-    `;
-
-    jobResults.appendChild(card);
-  });
-
-  renderJobPagination(totalPages);
-}
-
-function formatJobDate(dateString) {
-  const date = new Date(dateString + "T00:00:00");
-
-  if (Number.isNaN(date.getTime())) return "";
-
-  return date.toLocaleDateString("en-PH", {
-    year: "numeric",
-    month: "short",
-    day: "numeric"
-  });
-}
-
-function renderJobPagination(totalPages) {
-  jobsPagination.innerHTML = "";
-
-  if (totalPages <= 1) return;
-
-  const previousButton = document.createElement("button");
-  previousButton.type = "button";
-  previousButton.textContent = "Previous";
-  previousButton.disabled = currentJobPage === 1;
-
-  previousButton.addEventListener("click", () => {
-    if (currentJobPage > 1) {
-      currentJobPage--;
-      renderJobs();
-    }
-  });
-
-  jobsPagination.appendChild(previousButton);
-
-  for (let page = 1; page <= totalPages; page++) {
-    const button = document.createElement("button");
-
-    button.type = "button";
-    button.textContent = page;
-
-    if (page === currentJobPage) {
-      button.classList.add("active");
-    }
-
-    button.addEventListener("click", () => {
-      currentJobPage = page;
-      renderJobs();
-    });
-
-    jobsPagination.appendChild(button);
-  }
-
-  const nextButton = document.createElement("button");
-  nextButton.type = "button";
-  nextButton.textContent = "Next";
-  nextButton.disabled = currentJobPage === totalPages;
-
-  nextButton.addEventListener("click", () => {
-    if (currentJobPage < totalPages) {
-      currentJobPage++;
-      renderJobs();
-    }
-  });
-
-  jobsPagination.appendChild(nextButton);
-}
-
-function resetJobPage() {
-  currentJobPage = 1;
-  renderJobs();
-}
-
-if (jobSearchInput) {
-  jobSearchInput.addEventListener("input", resetJobPage);
-}
-
-if (jobSearchButton) {
-  jobSearchButton.addEventListener("click", resetJobPage);
-}
-
-if (jobSort) {
-  jobSort.addEventListener("change", resetJobPage);
-}
-
-document.querySelectorAll("[data-job-category]").forEach((button) => {
-  button.addEventListener("click", () => {
-    document.querySelectorAll("[data-job-category]").forEach((item) => {
-      item.classList.remove("active");
-    });
-
-    button.classList.add("active");
-    selectedJobCategory = button.dataset.jobCategory;
-
-    resetJobPage();
-  });
-});
-
-document.querySelectorAll("[data-job-type]").forEach((checkbox) => {
-  checkbox.addEventListener("change", resetJobPage);
-});
-
-if (clearJobFilters) {
-  clearJobFilters.addEventListener("click", () => {
-    jobSearchInput.value = "";
-    jobSort.value = "title";
-
-    selectedJobCategory = "All";
-
-    document.querySelectorAll("[data-job-category]").forEach((button) => {
-      button.classList.toggle(
-        "active",
-        button.dataset.jobCategory === "All"
-      );
-    });
-
-    document.querySelectorAll("[data-job-type]").forEach((checkbox) => {
-      checkbox.checked = false;
-    });
-
-    resetJobPage();
-  });
-}
-
-/* JOB DETAILS */
-
-function fillJobList(id, lines) {
-  const element = document.getElementById(id);
-
-  if (!element) return;
-
-  const items = (lines || []).filter(Boolean);
-
-  if (element.tagName === "UL" || element.tagName === "OL") {
-    element.innerHTML = "";
-
-    items.forEach((line) => {
-      const item = document.createElement("li");
-      item.textContent = line;
-      element.appendChild(item);
-    });
-  } else {
-    element.textContent = items.join(" ");
-  }
-
-  const section = element.closest(".job-detail-section");
-
-  if (section) {
-    section.hidden = items.length === 0;
-  }
-}
-
-function showJobDetails(job) {
-  document.getElementById("job-detail-category").textContent = job.category;
-  document.getElementById("job-detail-title").textContent = job.title;
-  document.getElementById("job-detail-business").textContent = job.business;
-  document.getElementById("job-detail-status").textContent = job.status;
-
-  document.getElementById("job-detail-meta").innerHTML = `
-    <span>${escapeHtml(job.type)}</span>
-    <span>${escapeHtml(job.schedule)}</span>
-    <span>${escapeHtml(job.salary)}</span>
-    <span>${escapeHtml(job.location)}</span>
-    <span>Posted: ${escapeHtml(formatJobDate(job.posted))}</span>
-  `;
-
-  document.getElementById("job-detail-description").textContent =
-    job.description || "";
-
-  fillJobList("job-detail-responsibilities", job.responsibilities);
-  fillJobList("job-detail-requirements", job.requirements);
-  fillJobList("job-detail-qualifications", job.qualifications);
-  fillJobList("job-detail-application", job.application);
-
-  const mapBox = document.getElementById("job-detail-map");
-  const mapSection = document.getElementById("job-detail-map-section");
-
-  if (mapBox) {
-    mapBox.innerHTML = "";
-
-    if (
-      job.mapSrc &&
-      job.mapSrc.startsWith("https://www.google.com/maps")
-    ) {
-      const frame = document.createElement("iframe");
-
-      frame.src = job.mapSrc;
-      frame.title = `Map of ${job.business}`;
-      frame.loading = "lazy";
-      frame.referrerPolicy = "no-referrer-when-downgrade";
-
-      mapBox.appendChild(frame);
-
-      if (mapSection) mapSection.hidden = false;
-    } else if (mapSection) {
-      mapSection.hidden = true;
-    }
-  }
-
-  showPage("job-info");
-}
-
-if (jobResults) {
-  jobResults.addEventListener("click", (event) => {
-    const button = event.target.closest("[data-job-id]");
-
-    if (!button) return;
-
-    const job = jobListings.find(
-      (item) => String(item.id) === button.dataset.jobId
-    );
-
-    if (job) {
-      showJobDetails(job);
-    }
-  });
-}
-
-loadJobs();
-
 /* BUSINESS LISTINGS */
 
 let businessListings = [];
@@ -693,6 +301,14 @@ let selectedBusinessCategory = "All";
 let currentBusinessPage = 1;
 const businessesPerPage = 4;
 
+/* KEYWORD SEARCH: placeholders now say that keywords work */
+
+const SEARCH_PLACEHOLDER = "Search by name, product, or service (e.g. haircut)";
+
+if (businessSearchInput) {
+  businessSearchInput.placeholder = SEARCH_PLACEHOLDER;
+}
+
 const CATEGORY_STYLE = {
   "Food and Beverages": { cls: "cat-food", icon: "tools-kitchen-2" },
   "Services": { cls: "cat-services", icon: "tool" },
@@ -705,12 +321,147 @@ function categoryStyle(category) {
   return CATEGORY_STYLE[category] || CATEGORY_STYLE.Others;
 }
 
+/* KEYWORD SEARCH HELPERS
+   A business matches when EVERY word typed is found in its
+   name, category, about text, or its products and services.
+   Words with the same meaning (synonyms) also count, for example
+   "clothes" finds "streetwear" and "haircut" finds "barbershop". */
+
+// each line is one group of words that mean almost the same thing
+// add your own words here any time
+const SEARCH_GROUPS = [
+  ["clothes", "clothing", "clothe", "apparel", "streetwear", "garment", "fashion",
+   "shirt", "tshirt", "t-shirt", "polo", "pants", "shorts", "jeans", "jacket",
+   "hoodie", "dress", "outfit", "damit", "thrift", "ukay"],
+  ["haircut", "hair", "barber", "barbershop", "salon", "gupit", "hairstyle"],
+  ["food", "restaurant", "meal", "eatery", "karinderya", "kain"],
+  ["bread", "bakery", "bakeshop", "cake", "pastry", "mamon", "tinapay"],
+  ["medicine", "pharmacy", "drugstore", "botika", "gamot"],
+  ["shoes", "footwear", "sneakers", "sandals", "sapatos"]
+];
+
+function escapeRegex(text) {
+  return text.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
+// returns the other words that mean the same as the typed word
+function relatedWords(word) {
+  if (word.length < 3) return [];
+
+  const related = [];
+
+  SEARCH_GROUPS.forEach((group) => {
+    const inGroup = group.some(
+      (term) => term.startsWith(word) || word.startsWith(term)
+    );
+
+    if (inGroup) {
+      group.forEach((term) => {
+        if (!related.includes(term)) related.push(term);
+      });
+    }
+  });
+
+  return related;
+}
+
+// finds a related word at the START of a word in the text
+// (so "dress" does not match "address")
+function findRelatedInText(text, word) {
+  return relatedWords(word).find((term) =>
+    new RegExp("\\b" + escapeRegex(term)).test(text)
+  );
+}
+
+function businessSearchText(business) {
+  if (!business._searchText) {
+    const parts = [
+      business.name,
+      business.category,
+      business.info
+    ];
+
+    (business.products || []).forEach((item) => {
+      parts.push(item.name, item.description);
+    });
+
+    business._searchText = parts
+      .map((part) => String(part || ""))
+      .join(" ")
+      .toLowerCase();
+  }
+
+  return business._searchText;
+}
+
+function searchWords(term) {
+  return String(term || "")
+    .toLowerCase()
+    .split(/\s+/)
+    .filter(Boolean);
+}
+
+function matchesKeywords(business, term) {
+  const words = searchWords(term);
+
+  if (words.length === 0) return true;
+
+  const text = businessSearchText(business);
+
+  return words.every(
+    (word) => text.includes(word) || findRelatedInText(text, word) !== undefined
+  );
+}
+
+// finds the product/service that matched (used to explain the result)
+function matchedItemName(business, term) {
+  const words = searchWords(term);
+
+  if (words.length === 0) return "";
+
+  const found = (business.products || []).find((item) => {
+    const text = `${item.name || ""} ${item.description || ""}`.toLowerCase();
+
+    return words.some(
+      (word) => text.includes(word) || findRelatedInText(text, word) !== undefined
+    );
+  });
+
+  return found ? found.name : "";
+}
+
+// when no product matched, shows the related word found in the shop text
+// example: searching "clothes" shows "streetwear"
+function matchedKeyword(business, term) {
+  const text = businessSearchText(business);
+
+  for (const word of searchWords(term)) {
+    if (text.includes(word)) return "";
+
+    const related = findRelatedInText(text, word);
+
+    if (related) return related;
+  }
+
+  return "";
+}
+
+/* IMAGE PATH AND URL SUPPORT */
+
 function safeImagePath(path) {
-  return typeof path === "string" &&
-    /^uploads\/[\w\-./]+$/.test(path) &&
-    !path.includes("..")
-    ? path
-    : "";
+  if (typeof path !== "string") return "";
+
+  const image = path.trim();
+
+  if (!image) return "";
+
+  const isExternalUrl = /^https?:\/\/[^\s"'<>]+$/i.test(image);
+
+  const isLocalPath =
+    /^uploads\/[\w\-./]+$/.test(image) &&
+    !image.includes("..");
+
+  return isExternalUrl || isLocalPath ? image : "";
 }
 
 function imageOrPlaceholder(path, category, icon, altText) {
@@ -795,7 +546,105 @@ function renderFeaturedBusinesses() {
   });
 }
 
+/* OPEN NOW */
+
+const openNowList = document.getElementById("open-now-list");
+
+function formatClock(time) {
+  const [hour, minute] = String(time || "").split(":").map(Number);
+
+  if (Number.isNaN(hour) || Number.isNaN(minute)) return "";
+
+  const suffix = hour >= 12 ? "PM" : "AM";
+  const hour12 = hour % 12 || 12;
+
+  return `${hour12}:${String(minute).padStart(2, "0")} ${suffix}`;
+}
+
+function renderOpenNowBusinesses() {
+  if (!openNowList) return;
+
+  const openBusinesses = businessListings
+    .filter((business) => getOpenStatus(business) === true)
+    .slice(0, 5);
+
+  openNowList.innerHTML = "";
+
+  if (openBusinesses.length === 0) {
+    openNowList.textContent = businessesLoadFailed
+      ? "Businesses could not be loaded. Please try again later."
+      : "No businesses are open right now.";
+    return;
+  }
+
+  openBusinesses.forEach((business) => {
+    const style = categoryStyle(business.category);
+    const card = document.createElement("article");
+
+    card.className = "card";
+    card.innerHTML = `
+      <div class="card-media">
+        ${imageOrPlaceholder(
+          business.profile || business.cover,
+          business.category,
+          style.icon,
+          business.name
+        )}
+      </div>
+
+      <div class="card-content">
+                <span class="featured-category open-badge">
+          ${escapeHtml(business.is247 ? "Open 24/7" : "Open until " + formatClock(business.closeTime))}
+        </span>
+        <h3>${escapeHtml(business.name)}</h3>
+        <p>${escapeHtml(business.info || "Discover this local business in Barangay Landayan.")}</p>
+        <div class="card-action">
+          <button type="button" class="btn" data-open-business-id="${escapeHtml(business.id)}">
+            View Business
+          </button>
+        </div>
+      </div>
+    `;
+
+    openNowList.appendChild(card);
+  });
+}
+
+if (openNowList) {
+  openNowList.addEventListener("click", (event) => {
+    const button = event.target.closest("[data-open-business-id]");
+
+    if (!button) return;
+
+    const business = businessListings.find(
+      (item) => String(item.id) === button.dataset.openBusinessId
+    );
+
+    if (business) {
+      showBusinessDetails(business);
+    }
+  });
+}
+
+// keep the list accurate while the page stays open
+setInterval(() => {
+  renderOpenNowBusinesses();
+  renderBusinesses();
+}, 60000);
+
+const openNowViewAll = document.getElementById("open-now-view-all");
+
+if (openNowViewAll) {
+  openNowViewAll.addEventListener("click", () => {
+    setCategoryAll();
+    businessSearchInput.value = "";
+    businessSort.value = "open";
+    resetBusinessPage();
+  });
+}
+
 function getOpenStatus(business) {
+    if (business.is247) return true;
   if (!business.openTime || !business.closeTime) return null;
 
   const toMinutes = (time) => {
@@ -811,6 +660,12 @@ function getOpenStatus(business) {
   return open <= close
     ? current >= open && current < close
     : current >= open || current < close;
+}
+function statusText(business) {
+  if (business.is247) return "Open 24/7";
+  const status = getOpenStatus(business);
+  if (status === null) return "";
+  return status ? `Open until ${formatClock(business.closeTime)}` : "Closed";
 }
 
 async function loadBusinesses() {
@@ -832,8 +687,9 @@ async function loadBusinesses() {
     businessesLoadFailed = true;
   }
 
-  renderBusinesses();
+   renderBusinesses();
   renderFeaturedBusinesses();
+  renderOpenNowBusinesses();
 
   if (location.hash === "#shop-details") {
     const savedBusinessId = localStorage.getItem("landayanfinds_active_business");
@@ -850,38 +706,41 @@ async function loadBusinesses() {
   }
 }
 
+/* SEARCH BY KEYWORD (name, category, about, products and services).
+   Category filter is ignored while searching. */
+
 function getFilteredBusinesses() {
   const searchTerm = businessSearchInput.value.trim().toLowerCase();
 
   const filtered = businessListings.filter((business) => {
-    const itemText = (business.products || [])
-      .map((item) => `${item.name} ${item.description || ""}`)
-      .join(" ");
+    const matchesSearch = matchesKeywords(business, searchTerm);
 
-    const matchesSearch = [
-      business.name,
-      business.category,
-      business.info,
-      itemText
-    ]
-      .join(" ")
-      .toLowerCase()
-      .includes(searchTerm);
-
+    // while something is being searched, the category filter is ignored
     const matchesCategory =
+      searchTerm !== "" ||
       selectedBusinessCategory === "All" ||
       business.category === selectedBusinessCategory;
 
     return matchesSearch && matchesCategory;
   });
 
-  const sortValue = businessSort.value;
+    const sortValue = businessSort.value;
 
   if (sortValue === "name") {
     filtered.sort((a, b) => String(a.name).localeCompare(String(b.name)));
   } else if (sortValue === "category") {
     filtered.sort((a, b) =>
       String(a.category).localeCompare(String(b.category))
+    );
+  } else if (sortValue === "open") {
+    const rank = (business) => {
+      const status = getOpenStatus(business);
+      return status === true ? 0 : status === false ? 1 : 2;
+    };
+
+    filtered.sort(
+      (a, b) =>
+        rank(a) - rank(b) || String(a.name).localeCompare(String(b.name))
     );
   }
 
@@ -931,7 +790,12 @@ function renderBusinesses() {
 
   displayed.forEach((business) => {
     const style = categoryStyle(business.category);
+    const openStatus = getOpenStatus(business);
 
+        const label = statusText(business);
+    const statusBadge = !label
+      ? ""
+      : `<span class="biz-status ${openStatus ? "is-open" : "is-closed"}">${escapeHtml(label)}</span>`;
     const tags = (business.products || [])
       .slice(0, 3)
       .map((item) => `<span class="job-tag">${escapeHtml(item.name)}</span>`)
@@ -952,7 +816,7 @@ function renderBusinesses() {
 
       <div class="job-card-content">
         <h3>${escapeHtml(business.name)}</h3>
-        <p class="job-card-business">${escapeHtml(business.category)}</p>
+                <p class="job-card-business">${escapeHtml(business.category)} ${statusBadge}</p>
 
         <div class="job-card-meta">
           <span>Address: ${escapeHtml(business.address)}</span>
@@ -1032,13 +896,392 @@ function resetBusinessPage() {
   renderBusinesses();
 }
 
+/* sets the category back to "All" (variable + buttons + mobile summary) */
+
+function setCategoryAll() {
+  selectedBusinessCategory = "All";
+
+  document.querySelectorAll("[data-business-category]").forEach((button) => {
+    button.classList.toggle(
+      "active",
+      button.dataset.businessCategory === "All"
+    );
+  });
+
+  const summary = document.querySelector(".filter-toggle-summary");
+  const badge = document.querySelector(".filter-badge");
+
+  if (summary) summary.textContent = "All categories";
+
+  if (badge) {
+    badge.textContent = "0";
+    badge.hidden = true;
+  }
+}
+
 if (businessSearchInput) {
-  businessSearchInput.addEventListener("input", resetBusinessPage);
+  businessSearchInput.addEventListener("input", () => {
+    if (businessSearchInput.value.trim() !== "") {
+      setCategoryAll();
+    }
+
+    resetBusinessPage();
+  });
 }
 
 if (businessSearchButton) {
-  businessSearchButton.addEventListener("click", resetBusinessPage);
+  businessSearchButton.addEventListener("click", () => {
+    if (businessSearchInput.value.trim() !== "") {
+      setCategoryAll();
+    }
+
+    resetBusinessPage();
+  });
 }
+
+/* HOME PAGE SEARCH */
+
+const homeSearchInput = document.getElementById("home-search-input");
+const homeSearchButton = document.getElementById("home-search-button");
+
+if (homeSearchInput) {
+  homeSearchInput.placeholder = SEARCH_PLACEHOLDER;
+}
+
+function runHomeSearch() {
+  if (!homeSearchInput) return;
+
+  const keyword = homeSearchInput.value.trim();
+
+  setCategoryAll();
+
+  businessSearchInput.value = keyword;
+  businessSort.value = "name";
+
+  hideHomeSuggestions();
+  showPage("businesses");
+  resetBusinessPage();
+}
+
+if (homeSearchButton) {
+  homeSearchButton.addEventListener("click", runHomeSearch);
+}
+
+/* HOME PAGE SEARCH DROPDOWN */
+
+const homeSuggestionStyles = document.createElement("style");
+
+homeSuggestionStyles.textContent = `
+  .cover {
+    z-index: 5;
+  }
+
+  .home-suggestions {
+    position: absolute;
+    top: calc(100% + 6px);
+    left: 0;
+    right: 0;
+    z-index: 9999;
+    margin: 0;
+    padding: 6px;
+    list-style: none;
+    max-height: 320px;
+    overflow-y: auto;
+    text-align: left;
+    background: #fff;
+    border: 1px solid #dce5e1;
+    border-radius: 10px;
+    box-shadow: 0 14px 30px rgba(6, 86, 79, 0.18);
+  }
+
+  .home-suggestions[hidden] {
+    display: none;
+  }
+
+  .home-suggestions-empty {
+    padding: 14px 10px;
+    color: #788680;
+    font-size: 13px;
+  }
+
+  .home-suggestion {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 8px 10px;
+    border-radius: 8px;
+    cursor: pointer;
+    color: #173d37;
+  }
+
+  .home-suggestion:hover,
+  .home-suggestion.active {
+    background: #e6f7f0;
+  }
+
+  .home-suggestion-thumb {
+    width: 40px;
+    height: 40px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    border: 1px solid #e1e8e5;
+    border-radius: 8px;
+    background: #fff;
+  }
+
+  .home-suggestion-thumb img {
+    width: 100%;
+    height: 100%;
+    display: block;
+    object-fit: contain;
+  }
+
+  .home-suggestion-thumb .photo-fallback {
+    font-size: 18px;
+  }
+
+  .home-suggestion-text {
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .home-suggestion-text strong {
+    font-size: 14px;
+    font-weight: 500;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .home-suggestion-text strong b {
+    font-weight: 700;
+    color: #087f70;
+  }
+
+  .home-suggestion-text small {
+    color: #087f70;
+    font-size: 11px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+`;
+
+document.head.appendChild(homeSuggestionStyles);
+
+const homeSuggestions = document.createElement("ul");
+
+homeSuggestions.className = "home-suggestions";
+homeSuggestions.id = "home-suggestions";
+homeSuggestions.setAttribute("role", "listbox");
+homeSuggestions.hidden = true;
+
+let suggestionBusinesses = [];
+let activeSuggestionIndex = -1;
+
+if (homeSearchInput) {
+  const homeSearchBox = homeSearchInput.closest(".search");
+
+  if (homeSearchBox) {
+    homeSearchBox.appendChild(homeSuggestions);
+  }
+
+  homeSearchInput.setAttribute("autocomplete", "off");
+  homeSearchInput.setAttribute("aria-controls", "home-suggestions");
+}
+
+function hideHomeSuggestions() {
+  homeSuggestions.hidden = true;
+  homeSuggestions.innerHTML = "";
+  suggestionBusinesses = [];
+  activeSuggestionIndex = -1;
+}
+
+function getSuggestedBusinesses(term) {
+  const keyword = term.trim().toLowerCase();
+
+  if (!keyword) return [];
+
+  // 0 = name starts with it, 1 = name contains it, 2 = matched by keyword only
+  const rank = (business) => {
+    const name = String(business.name || "").toLowerCase();
+
+    if (name.startsWith(keyword)) return 0;
+    if (name.includes(keyword)) return 1;
+    return 2;
+  };
+
+  return businessListings
+    .filter((business) => matchesKeywords(business, keyword))
+    .sort(
+      (a, b) =>
+        rank(a) - rank(b) || String(a.name).localeCompare(String(b.name))
+    )
+    .slice(0, 6);
+}
+
+function highlightMatch(name, term) {
+  const text = String(name || "");
+  const index = text.toLowerCase().indexOf(term.trim().toLowerCase());
+
+  if (index === -1 || !term.trim()) return escapeHtml(text);
+
+  const end = index + term.trim().length;
+
+  return (
+    escapeHtml(text.slice(0, index)) +
+    "<b>" + escapeHtml(text.slice(index, end)) + "</b>" +
+    escapeHtml(text.slice(end))
+  );
+}
+
+function setActiveSuggestion(index) {
+  homeSuggestions.querySelectorAll(".home-suggestion").forEach((item, itemIndex) => {
+    item.classList.toggle("active", itemIndex === index);
+    item.setAttribute("aria-selected", String(itemIndex === index));
+  });
+
+  activeSuggestionIndex = index;
+}
+
+function renderHomeSuggestions() {
+  if (!homeSearchInput) return;
+
+  const term = homeSearchInput.value;
+
+  // dropdown only appears while something is being typed
+  if (!term.trim()) {
+    hideHomeSuggestions();
+    return;
+  }
+
+  suggestionBusinesses = getSuggestedBusinesses(term);
+  activeSuggestionIndex = -1;
+  homeSuggestions.innerHTML = "";
+
+  if (suggestionBusinesses.length === 0) {
+    const empty = document.createElement("li");
+
+    empty.className = "home-suggestions-empty";
+    empty.textContent = "No business found for that keyword.";
+    homeSuggestions.appendChild(empty);
+    homeSuggestions.hidden = false;
+    return;
+  }
+
+  suggestionBusinesses.forEach((business, index) => {
+    const style = categoryStyle(business.category);
+    const item = document.createElement("li");
+
+    // when the name does not contain the keyword, show the matching item
+    const nameHasTerm = String(business.name || "")
+      .toLowerCase()
+      .includes(term.trim().toLowerCase());
+    const itemMatch = nameHasTerm
+      ? ""
+      : matchedItemName(business, term) || matchedKeyword(business, term);
+    const subtitle = itemMatch
+      ? `${business.category} · ${itemMatch}`
+      : business.category;
+
+    item.className = "home-suggestion";
+    item.setAttribute("role", "option");
+    item.setAttribute("aria-selected", "false");
+    item.dataset.suggestionIndex = String(index);
+
+    item.innerHTML = `
+      <span class="home-suggestion-thumb">
+        ${imageOrPlaceholder(
+          business.profile || business.cover,
+          business.category,
+          style.icon,
+          business.name
+        )}
+      </span>
+      <span class="home-suggestion-text">
+        <strong>${highlightMatch(business.name, term)}</strong>
+        <small>${escapeHtml(subtitle)}</small>
+      </span>
+    `;
+
+    homeSuggestions.appendChild(item);
+  });
+
+  homeSuggestions.hidden = false;
+}
+
+function chooseSuggestion(index) {
+  const business = suggestionBusinesses[index];
+
+  if (!business) return;
+
+  homeSearchInput.value = business.name;
+  hideHomeSuggestions();
+  showBusinessDetails(business);
+}
+
+if (homeSearchInput) {
+  homeSearchInput.addEventListener("input", renderHomeSuggestions);
+  homeSearchInput.addEventListener("focus", renderHomeSuggestions);
+
+  homeSearchInput.addEventListener("keydown", (event) => {
+    const isOpen = !homeSuggestions.hidden && suggestionBusinesses.length > 0;
+
+    if (event.key === "ArrowDown" && isOpen) {
+      event.preventDefault();
+      setActiveSuggestion((activeSuggestionIndex + 1) % suggestionBusinesses.length);
+      return;
+    }
+
+    if (event.key === "ArrowUp" && isOpen) {
+      event.preventDefault();
+      setActiveSuggestion(
+        (activeSuggestionIndex - 1 + suggestionBusinesses.length) %
+          suggestionBusinesses.length
+      );
+      return;
+    }
+
+    if (event.key === "Escape") {
+      hideHomeSuggestions();
+      return;
+    }
+
+    if (event.key === "Enter") {
+      event.preventDefault();
+
+      if (isOpen && activeSuggestionIndex >= 0) {
+        chooseSuggestion(activeSuggestionIndex);
+      } else {
+        runHomeSearch();
+      }
+    }
+  });
+}
+
+// mousedown fires before the input loses focus, so the click is never lost
+homeSuggestions.addEventListener("mousedown", (event) => {
+  const item = event.target.closest(".home-suggestion");
+
+  if (!item) return;
+
+  event.preventDefault();
+  chooseSuggestion(Number(item.dataset.suggestionIndex));
+});
+
+document.addEventListener("click", (event) => {
+  if (
+    !event.target.closest("#home-suggestions") &&
+    event.target !== homeSearchInput
+  ) {
+    hideHomeSuggestions();
+  }
+});
 
 if (businessSort) {
   businessSort.addEventListener("change", resetBusinessPage);
@@ -1053,6 +1296,9 @@ document.querySelectorAll("[data-business-category]").forEach((button) => {
     button.classList.add("active");
     selectedBusinessCategory = button.dataset.businessCategory;
 
+    // choosing a category clears the search so the two don't conflict
+    businessSearchInput.value = "";
+
     resetBusinessPage();
   });
 });
@@ -1062,17 +1308,7 @@ if (clearBusinessFilters) {
     businessSearchInput.value = "";
     businessSort.value = "name";
 
-    selectedBusinessCategory = "All";
-
-    document
-      .querySelectorAll("[data-business-category]")
-      .forEach((button) => {
-        button.classList.toggle(
-          "active",
-          button.dataset.businessCategory === "All"
-        );
-      });
-
+    setCategoryAll();
     resetBusinessPage();
   });
 }
@@ -1183,7 +1419,7 @@ function showBusinessDetails(business, restoring = false) {
     status.hidden = true;
   } else {
     status.hidden = false;
-    status.textContent = openNow ? "Open now" : "Closed now";
+    status.textContent = statusText(business);
     status.classList.toggle("is-closed", !openNow);
   }
 
@@ -1309,7 +1545,7 @@ if (businessResults) {
 
 loadBusinesses();
 
-/* FILTER PANELS */
+/* BUSINESS FILTER PANELS */
 
 document.querySelectorAll(".jobs-sidebar").forEach((sidebar) => {
   const toggle = sidebar.querySelector(".filter-toggle");
@@ -1325,16 +1561,10 @@ document.querySelectorAll(".jobs-sidebar").forEach((sidebar) => {
     const categoryText = activeCategory ? activeCategory.textContent.trim() : "";
     const categoryChosen =
       activeCategory &&
-      activeCategory.dataset.jobCategory !== "All" &&
       activeCategory.dataset.businessCategory !== "All";
-
-    const types = Array.from(
-      sidebar.querySelectorAll("[data-job-type]:checked")
-    ).map((input) => input.value);
 
     const parts = [];
     if (categoryChosen) parts.push(categoryText);
-    parts.push(...types);
 
     summary.textContent = parts.length ? parts.join(" · ") : "All categories";
 

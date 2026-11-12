@@ -2918,3 +2918,232 @@ nav a:hover {
   margin-left: auto;
   margin-right: auto;
 }
+
+/* ============================================================
+   OPEN NOW (same look as featured businesses)
+   ============================================================ */
+
+#open-now-list {
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  align-items: stretch;
+  gap: 12px;
+  padding: 4px 0 8px;
+}
+
+#open-now-list .card {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  padding: 0;
+  overflow: hidden;
+  border-radius: 12px;
+  box-shadow: 0 2px 10px rgba(18, 76, 62, 0.06);
+}
+
+#open-now-list .card-media {
+  width: 100%;
+  height: 96px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px;
+  background: #f0f6f3;
+  border-bottom: 1px solid var(--border);
+}
+
+#open-now-list .card-media img {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: contain;
+  border-radius: 8px;
+}
+
+#open-now-list .card-media .photo-fallback {
+  border-radius: 8px;
+  font-size: 30px;
+}
+
+#open-now-list .card-content {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 4px;
+  padding: 10px 10px 0;
+}
+
+#open-now-list .featured-category {
+  align-self: flex-start;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: #e8f7f1;
+  color: var(--green);
+  font-size: 10px;
+  font-weight: 600;
+}
+
+#open-now-list .open-badge::before {
+  content: "";
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  margin-right: 5px;
+  border-radius: 50%;
+  background: #22c55e;
+  vertical-align: middle;
+}
+
+#open-now-list .card-content h3 {
+  margin: 2px 0 0;
+  min-height: 2.6em;
+  font-size: 13px;
+  line-height: 1.3;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+#open-now-list .card-content p {
+  margin: 0;
+  min-height: 2.9em;
+  font-size: 11px;
+  line-height: 1.45;
+  color: #5b6b66;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+#open-now-list .card-action {
+  margin-top: auto;
+  padding: 10px 0 12px;
+}
+
+#open-now-list .card-action .btn {
+  display: block;
+  width: 100%;
+  margin: 0;
+  padding: 8px 10px;
+  font-size: 12px;
+  line-height: 1.2;
+  text-align: center;
+  white-space: nowrap;
+}
+
+#open-now-list .card-action .btn:hover {
+  transform: none;
+}
+
+@media (max-width: 1100px) {
+  #open-now-list {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 800px) {
+  #open-now-list {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 420px) {
+  #open-now-list {
+    grid-template-columns: 1fr;
+  }
+}
+/* OPEN / CLOSED BADGE ON BUSINESS LISTINGS */
+
+.biz-status {
+  display: inline-block;
+  margin-left: 8px;
+  padding: 2px 9px;
+  border-radius: 999px;
+  font-size: 10px;
+  font-weight: 600;
+  vertical-align: middle;
+}
+
+.biz-status.is-open {
+  background: #e6f7f0;
+  color: #087f70;
+}
+
+.biz-status.is-open::before {
+  content: "";
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  margin-right: 5px;
+  border-radius: 50%;
+  background: #22c55e;
+  vertical-align: middle;
+}
+
+.biz-status.is-closed {
+  background: #f0f1f0;
+  color: #687772;
+}
+
+.view-all {
+  cursor: pointer;
+}
+/* BACK BUTTON (shop details) */
+
+.back {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 18px;
+  padding: 9px 16px 9px 10px;
+  border: 1px solid #dce5e1;
+  border-radius: 999px;
+  background: #fff;
+  color: #173d37;
+  font: 600 13px "Inter", sans-serif;
+  line-height: 1;
+  cursor: pointer;
+  box-shadow: 0 1px 2px rgba(18, 76, 62, 0.06);
+  -webkit-tap-highlight-color: transparent;
+}
+
+.back i {
+  font-size: 17px;
+  color: var(--green);
+  transition: transform 0.2s ease;
+}
+
+.back:hover {
+  background: #f0faf6;
+  border-color: var(--teal);
+  color: var(--green);
+  box-shadow: 0 3px 10px rgba(18, 76, 62, 0.1);
+}
+
+.back:hover i {
+  transform: translateX(-3px);
+}
+
+.back:active {
+  transform: scale(0.97);
+}
+
+.back:focus-visible {
+  outline: 2px solid var(--teal);
+  outline-offset: 2px;
+}
+
+@media (max-width: 650px) {
+  .back {
+    padding: 10px 15px 10px 9px;
+    font-size: 13px;
+  }
+}
